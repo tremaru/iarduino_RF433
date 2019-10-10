@@ -2,7 +2,7 @@
 
 **This is a library for Arduino IDE by iArduino.ru. It allows to work with [433Mhz radio modules](https://iarduino.ru/shop/Expansion-payments/besprovodnoy-peredatchik-priemnik-315-433mhz-dc5v.html)**
 
-**Данная библиотека для Arduino IDE от [iArduino.ru](https://iarduino.ru) позволяет управлять [радио модулями 433МГц](https://iarduino.ru/shop/Expansion-payments/besprovodnoy-peredatchik-priemnik-315-433mhz-dc5v.html)**
+**Данная библиотека для Arduino IDE от [iArduino.ru](https://iarduino.ru) позволяет работать c [радио модулями 433МГц](https://iarduino.ru/shop/Expansion-payments/besprovodnoy-peredatchik-priemnik-315-433mhz-dc5v.html)**
 
 > Подробнее про установку библиотеки читайте в нашей [инструкции](https://wiki.iarduino.ru/page/Installing_libraries/).
 
