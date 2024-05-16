@@ -81,26 +81,32 @@ void	i433_func_IRQ(){
 }
 
 //		Объявление экземпляра класса							([номер вывода])
-		iarduino_RF433_Receiver	::iarduino_RF433_Receiver		(uint8_t i)			{if(digitalPinToInterrupt(i)!=NOT_AN_INTERRUPT){i433VC.i433_pins_INPUT=i; i433VC.i433_ints_IRQ=digitalPinToInterrupt(i);}}
+		iarduino_RF433_Receiver::iarduino_RF433_Receiver		(uint8_t i){
+			#ifdef NOT_AN_INTERRUPT
+			if(digitalPinToInterrupt(i)!=NOT_AN_INTERRUPT){i433VC.i433_pins_INPUT=i; i433VC.i433_ints_IRQ=digitalPinToInterrupt(i);}
+			#else
+			i433VC.i433_pins_INPUT=i; i433VC.i433_ints_IRQ=digitalPinToInterrupt(i);
+			#endif
+		}
 		iarduino_RF433_Transmitter::iarduino_RF433_Transmitter	(uint8_t i)			{i433_pins_OUTPUT=i;}
 
 //		Инициация работы приёмника/передатчика					(без параметров)
-void	iarduino_RF433_Receiver	::begin							(uint16_t i)		{i433_time_RATE=(uint32_t) 500000/i; pinMode(i433VC.i433_pins_INPUT, INPUT); i433VC.i433_time_RATE[0]=i433_time_RATE/2; i433VC.i433_time_RATE[1]=i433_time_RATE*1; i433VC.i433_time_RATE[2]=i433_time_RATE*2; i433VC.i433_time_RATE[3]=i433_time_RATE*3; i433VC.i433_time_RATE[4]=i433_time_RATE*4;}
+void	iarduino_RF433_Receiver   ::begin						(uint16_t i)		{i433_time_RATE=(uint32_t) 500000/i; pinMode(i433VC.i433_pins_INPUT, INPUT); i433VC.i433_time_RATE[0]=i433_time_RATE/2; i433VC.i433_time_RATE[1]=i433_time_RATE*1; i433VC.i433_time_RATE[2]=i433_time_RATE*2; i433VC.i433_time_RATE[3]=i433_time_RATE*3; i433VC.i433_time_RATE[4]=i433_time_RATE*4;}
 void	iarduino_RF433_Transmitter::begin						(uint16_t i)		{i433_time_RATE=(uint32_t) 500000/i; pinMode(i433_pins_OUTPUT, OUTPUT); digitalWrite(i433_pins_OUTPUT,LOW);}
 
 //		Указываем скорость приёма/передачи данных				(скорость числом или константами: i433_5KBPS, i433_4KBPS, i433_3KBPS, i433_2KBPS, i433_1KBPS, i433_500BPS, i433_100BPS)
-void	iarduino_RF433_Receiver	::setDataRate					(uint16_t i)		{begin(i);}																	//	Устанавливаем скорость приёма данных
+void	iarduino_RF433_Receiver   ::setDataRate					(uint16_t i)		{begin(i);}																	//	Устанавливаем скорость приёма данных
 void	iarduino_RF433_Transmitter::setDataRate					(uint16_t i)		{begin(i);}																	//	Устанавливаем скорость передачи данных
 
 //		Открываем трубу для прослушивания/передачи				(номер трубы)
-void	iarduino_RF433_Receiver	::openReadingPipe				(uint8_t i)			{if(i>7){i433VC.i433_flag_ADDR=0xFF;}else{i433VC.i433_flag_ADDR|=1<<i;}}	//	Устанавливаем флаги труб  для приёма данных
+void	iarduino_RF433_Receiver   ::openReadingPipe				(uint8_t i)			{if(i>7){i433VC.i433_flag_ADDR=0xFF;}else{i433VC.i433_flag_ADDR|=1<<i;}}	//	Устанавливаем флаги труб  для приёма данных
 void	iarduino_RF433_Transmitter::openWritingPipe				(uint8_t i)			{if(i<8){i433_pipe_VALUE=i;}else{i433_pipe_VALUE=0;}}						//	Устанавливаем номер трубы для передачи данных
 
 //		Закрываем трубу от прослушивания						(номер трубы)
 void	iarduino_RF433_Receiver	::closeReadingPipe				(uint8_t i)			{if(i>7){i433VC.i433_flag_ADDR=0x00;}else{i433VC.i433_flag_ADDR&=~(1<<i);}}	//	Сбрасываем флаги труб
 
 //		Включаем приемник, начинаем прослушивание				(без параметров)
-void	iarduino_RF433_Receiver	::startListening				(void)				{
+void	iarduino_RF433_Receiver::startListening					(void)				{
 			#ifdef __SAM3X8E__ 
 				attachInterrupt(i433VC.i433_pins_INPUT, i433_func_IRQ, CHANGE);																					//	Направляем обработку прерывания i433_pins_INPUT (при условии CHANGE) на функцию i433_func_IRQ
 			#else              
@@ -109,7 +115,7 @@ void	iarduino_RF433_Receiver	::startListening				(void)				{
 }
 
 //		Выключаем приёмник, завершаем прослушивание				(без параметров)
-void	iarduino_RF433_Receiver	::stopListening					(void)				{
+void	iarduino_RF433_Receiver::stopListening					(void)				{
 			#ifdef __SAM3X8E__ 
 				detachInterrupt(i433VC.i433_pins_INPUT);																										//	Завершаем обработку прерываний для i433_pins_INPUT
 			#else              
@@ -118,10 +124,10 @@ void	iarduino_RF433_Receiver	::stopListening					(void)				{
 }
 
 //		Проверка наличия принятых данных						(без параметров)
-bool	iarduino_RF433_Receiver	::available						(void)				{return available(NULL);}
+bool	iarduino_RF433_Receiver::available						(void)				{return available(NULL);}
 
 //		Проверка наличия принятых данных						(указатель на переменную для получения номера трубы по которой приняты данные)
-bool	iarduino_RF433_Receiver	::available						(uint8_t* i)		{
+bool	iarduino_RF433_Receiver::available						(uint8_t* i)		{
 			if(i433VC.i433_data_Read){																															//	Если есть доступные для чтения байты
 				uint16_t CRC=i433CRC.i433_func_CRC16((uint8_t*)i433VC.i433_data_ByteRead,i433VC.i433_data_Read-2,1);											//	Рассчитываем значение CRC16 для информационных байт данных из принятого пакета (первый и два последних байта пакета, не являются информационными)
 				if(uint8_t(CRC>>8)!=i433VC.i433_data_ByteRead[i433VC.i433_data_Read-2]){i433VC.i433_data_Read=0; return 0;}										//	Если выявлено несовпадение старшего байта CRC16, то сбрасываем количество байт доступных для чтения и возвращаем false
@@ -132,7 +138,7 @@ bool	iarduino_RF433_Receiver	::available						(uint8_t* i)		{
 }
 
 //		Выводим принятые данные по переданному указателю		(указатель, количество байт)
-void	iarduino_RF433_Receiver	::read							(void* i, uint8_t j){
+void	iarduino_RF433_Receiver::read							(void* i, uint8_t j){
 			i433VC.i433_data_Read-=3;
 			if(j>i433VC.i433_data_Read){j=i433VC.i433_data_Read;}																								//	Если количество запрашиваемых байт больше полученных, то вернем исключительно полученные
 			uint8_t* answer = reinterpret_cast<uint8_t*>(i);																									//	Преобразуем полученный указатель к типу uint8_t
