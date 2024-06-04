@@ -1,5 +1,5 @@
 //	Библиотека для работы с радиопередатчиком FS1000A и(или) радиоприёмником MX-RM-5V, работающими на частоте 433,920 МГц: http://iarduino.ru/shop/Expansion-payments/besprovodnoy-peredatchik-priemnik-315-433mhz-dc5v.html
-//  Версия: 1.0.1
+//  Версия: 1.0.2
 //  Последнюю версию библиотеки Вы можете скачать по ссылке: http://iarduino.ru/file/280.html
 //  Подробное описание функции бибилиотеки доступно по ссылке: https://lesson.iarduino.ru/page/urok-26-6-soedinyaem-dve-arduino-po-radiokanalu-433-mgc/
 //  Библиотека является собственностью интернет магазина iarduino.ru и может свободно использоваться и распространяться!
