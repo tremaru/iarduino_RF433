@@ -132,14 +132,15 @@ bool	iarduino_RF433_Receiver::available						(uint8_t* i)		{
 				uint16_t CRC=i433CRC.i433_func_CRC16((uint8_t*)i433VC.i433_data_ByteRead,i433VC.i433_data_Read-2,1);											//	Рассчитываем значение CRC16 для информационных байт данных из принятого пакета (первый и два последних байта пакета, не являются информационными)
 				if(uint8_t(CRC>>8)!=i433VC.i433_data_ByteRead[i433VC.i433_data_Read-2]){i433VC.i433_data_Read=0; return 0;}										//	Если выявлено несовпадение старшего байта CRC16, то сбрасываем количество байт доступных для чтения и возвращаем false
 				if(uint8_t(CRC   )!=i433VC.i433_data_ByteRead[i433VC.i433_data_Read-1]){i433VC.i433_data_Read=0; return 0;}										//	Если выявлено несовпадение младшего байта CRC16, то сбрасываем количество байт доступных для чтения и возвращаем false
-				*i=i433VC.i433_data_ByteRead[0]>>5;																												//	Передаём номер трубы по указателю
+				if(i){*i=i433VC.i433_data_ByteRead[0]>>5;}																										//	Передаём номер трубы по указателю, если он указан
 				return 1;																																		//	Возвращаем true
 			}else{return 0;}																																	//	Возвращаем false
 }
 
 //		Выводим принятые данные по переданному указателю		(указатель, количество байт)
 void	iarduino_RF433_Receiver::read							(void* i, uint8_t j){
-			i433VC.i433_data_Read-=3;
+			if(i433VC.i433_data_Read<3){return;}																												//	Если принятых данных нет, то и читать нечего
+			i433VC.i433_data_Read-=3;																															//	Вычитаем байт заголовка и два байта CRC16
 			if(j>i433VC.i433_data_Read){j=i433VC.i433_data_Read;}																								//	Если количество запрашиваемых байт больше полученных, то вернем исключительно полученные
 			uint8_t* answer = reinterpret_cast<uint8_t*>(i);																									//	Преобразуем полученный указатель к типу uint8_t
 			uint8_t k=0; while(k<j){*answer++ = i433VC.i433_data_ByteRead[k+1]; k++;}																			//	Передаем данные в цикле, разыменовывая указатель и увеличивая адрес на который он ссылкается
@@ -148,6 +149,7 @@ void	iarduino_RF433_Receiver::read							(void* i, uint8_t j){
 
 //		Получаем по указателю данные для передачи				()
 void	iarduino_RF433_Transmitter::write						(const void* i, uint8_t j){
+			if(j==0){return;} if(j>32){j=32;}																													//	Передаём от 1 до 32 байт: длина данных занимает 5 бит первого байта
 			const uint8_t* transfer = reinterpret_cast<const uint8_t*>(i);																						//	Преобразуем полученный указатель к типу const uint8_t
 			uint16_t CRC=i433CRC.i433_func_CRC16(transfer,j);																									//	Рассчитываем значение CRC16 для данных из передаваемого пакета
 			i433_func_SendBit(1); i433_func_SendBit(1); i433_func_SendBit(1);																					//	Передаём три предстартовых бита
